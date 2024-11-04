@@ -17,3 +17,18 @@ a,
 li {
   text-decoration: none;
 }
+
+label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+@layer components {
+  .input-containers {
+    @apply flex flex-col gap-1 mb-2;
+  }
+
+  .inputs {
+    @apply p-2 border outline-none rounded-md;
+  }
+}

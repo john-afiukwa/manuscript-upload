@@ -50,28 +50,27 @@ const UploadManuscript = () => {
                 }}
                 hidden
               />
-              <div
-                className="flex flex-col items-center justify-center cursor-pointer"
-                onClick={() => document.querySelector("#upload-file").click()}
-              >
-                {displayFileName === uploadInfo ? (
-                  <>
-                    <MdIcons.MdOutlineFileUpload className="text-6xl text-[#1b9c85]" />
-                    <button
-                      className="bg-[#1b9c85] font-semibold text-white py-1 px-4 rounded-2xl
+
+              {displayFileName === uploadInfo ? (
+                <section
+                  className="flex flex-col items-center justify-center cursor-pointer"
+                  onClick={() => document.querySelector("#upload-file").click()}
+                >
+                  <MdIcons.MdOutlineFileUpload className="text-6xl text-[#1b9c85]" />
+                  <button
+                    className="bg-[#1b9c85] font-semibold text-white py-1 px-4 rounded-2xl
                 hover:bg-[#1b9c70] outline-none"
-                    >
-                      Select file
-                    </button>
-                    <p className="mt-3 text-slate-300">Drop a file here</p>
-                  </>
-                ) : (
-                  <>
-                    <FaIcons.FaCheck className="text-6xl text-[#1b9c85]" />
-                    <p className="mt-3 text-slate-300">File Selected</p>
-                  </>
-                )}
-              </div>
+                  >
+                    Select file
+                  </button>
+                  <p className="mt-3 text-slate-300">Drop a file here</p>
+                </section>
+              ) : (
+                <>
+                  <FaIcons.FaCheck className="text-6xl text-[#1b9c85]" />
+                  <p className="mt-3 text-slate-300">File Selected</p>
+                </>
+              )}
             </div>
           </div>
 
