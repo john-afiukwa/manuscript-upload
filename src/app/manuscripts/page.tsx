@@ -1,21 +1,18 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+"use client"
 
-import FunaiLogo from "../images/funai_Logo.png";
-import Logo from "../images/FUNAI-logoSm.png";
-
-import * as IoIcons from "react-icons/io5";
+import Icons from "@src/components/icons";
+import { sideNavItems } from "@src/contents/constants";
+import Link from "next/link";
+import { useState } from "react";
 import { BsArrowLeftShort } from "react-icons/bs";
-import * as FaIcons from "react-icons/fa";
-import * as FiIcons from "react-icons/fi";
-import * as RiIcons from "react-icons/ri";
-import { navigations } from "../contents/constants";
-import Icons from "../components/icons";
-{
-  /* <RiIcons.RiLogoutCircleLine />; */
-}
+import { FiSearch } from "react-icons/fi";
+import { RiLogoutCircleLine } from "react-icons/ri";
 
-const Manuscript = () => {
+import FunaiLogo from "@public/images/funai_Logo.png";
+import Logo from "@public/images/FUNAI-logoSm.png";
+import Image from "next/image";
+
+export default function Page() { 
   const [open, setOpen] = useState(true);
 
   return (
@@ -27,9 +24,9 @@ const Manuscript = () => {
           } duration-300 relative`}
         >
           {open ? (
-            <img src={FunaiLogo} className="w-40" />
+            <Image src={FunaiLogo} alt="Funai Logo" className="w-40" />
           ) : (
-            <img src={Logo} className="w-30" />
+            <Image src={Logo} alt="Logo" className="w-40" />
           )}
 
           <BsArrowLeftShort
@@ -41,10 +38,10 @@ const Manuscript = () => {
           />
 
           <div className="bg-cyan-300 flex flex-col justify-between">
-            {navigations.map(({ title, path, icon }, index) => {
+            {sideNavItems.map(({ title, path, icon }, index) => {
               return (
                 <div key={index}>
-                  <Link to={path} className="flex items-center gap-2 text-xl">
+                  <Link href={path} className="flex items-center gap-2 text-xl">
                     {Icons[icon]}
                     <span>{title}</span>
                   </Link>
@@ -65,7 +62,7 @@ const Manuscript = () => {
             </div> */}
 
             <div className="flex items-center gap-2 text-xl">
-              <RiIcons.RiLogoutCircleLine />
+              <RiLogoutCircleLine />
               <span>Log out</span>
             </div>
           </div>
@@ -92,7 +89,7 @@ const Manuscript = () => {
               className="py-[.8rem] px-4 cursor-pointer text-black 
             hover:bg-purple-500 hover:text-white transition rounded-r-lg"
             >
-              <FiIcons.FiSearch className="text-xl" />
+              <FiSearch className="text-xl" />
             </button>
           </div>
 
@@ -101,6 +98,4 @@ const Manuscript = () => {
       </div>
     </>
   );
-};
-
-export default Manuscript;
+}

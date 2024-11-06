@@ -1,12 +1,20 @@
-export const navigations = [
+import { IconsEnum as Icons } from "@src/types/icons";
+
+interface ISideNavItem { 
+  title: string;
+  icon: Icons;
+  path: string;
+}
+
+export const sideNavItems: ISideNavItem[] = [
   {
     title: "Manuscripts",
-    icon: "document",
+    icon: Icons.document,
     path: "/manuscripts",
   },
   {
     title: "Profile",
-    icon: "profile",
+    icon: Icons.profile,
     path: "/profile",
   },
 ];

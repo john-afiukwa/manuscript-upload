@@ -1,11 +1,13 @@
-import React, { useState } from "react";
-import * as MdIcons from "react-icons/md";
-import * as IoIcons from "react-icons/io";
-import * as FaIcons from "react-icons/fa6";
-import { db } from "../config/firebase";
-import { addDoc, collection } from "firebase/firestore";
+"use client"
 
-const UploadManuscript = () => {
+import { db } from "@src/config/firebase";
+import { addDoc, collection } from "firebase/firestore";
+import { useState } from "react";
+import { FaCheck } from "react-icons/fa6";
+import { IoMdDocument } from "react-icons/io";
+import { MdDelete, MdOutlineFileUpload } from "react-icons/md";
+
+export default function Page() { 
   const uploadInfo = "No file selected";
   const [displayFileName, setDisplayFileName] = useState(uploadInfo);
 
@@ -46,7 +48,9 @@ const UploadManuscript = () => {
                 type="file"
                 id="upload-file"
                 onChange={({ target: { files } }) => {
-                  files[0] && setDisplayFileName(files[0].name);
+                  if (files && files[0]) {
+                    setDisplayFileName(files[0].name);
+                  }
                 }}
                 hidden
               />
@@ -54,9 +58,9 @@ const UploadManuscript = () => {
               {displayFileName === uploadInfo ? (
                 <section
                   className="flex flex-col items-center justify-center cursor-pointer"
-                  onClick={() => document.querySelector("#upload-file").click()}
+                  onClick={() => (document.querySelector("#upload-file") as HTMLInputElement)?.click()}
                 >
-                  <MdIcons.MdOutlineFileUpload className="text-6xl text-[#1b9c85]" />
+                  <MdOutlineFileUpload className="text-6xl text-[#1b9c85]" />
                   <button
                     className="bg-[#1b9c85] font-semibold text-white py-1 px-4 rounded-2xl
                 hover:bg-[#1b9c70] outline-none"
@@ -67,7 +71,7 @@ const UploadManuscript = () => {
                 </section>
               ) : (
                 <>
-                  <FaIcons.FaCheck className="text-6xl text-[#1b9c85]" />
+                  <FaCheck className="text-6xl text-[#1b9c85]" />
                   <p className="mt-3 text-slate-300">File Selected</p>
                 </>
               )}
@@ -78,12 +82,12 @@ const UploadManuscript = () => {
             <div className="w-full bg-[#f7f7f7] h-10 rounded flex items-center justify-between px-2">
               <div className="flex items-center gap-1">
                 {displayFileName !== uploadInfo ? (
-                  <IoIcons.IoMdDocument className="text-[#1b9c85]" />
+                  <IoMdDocument className="text-[#1b9c85]" />
                 ) : null}
                 <p className="text-[14px]">{displayFileName}</p>
               </div>
               {displayFileName !== uploadInfo ? (
-                <MdIcons.MdDelete
+                <MdDelete
                   className="text-red-400 cursor-pointer"
                   onClick={() => setDisplayFileName(uploadInfo)}
                 />
@@ -102,6 +106,4 @@ const UploadManuscript = () => {
       </div>
     </>
   );
-};
-
-export default UploadManuscript;
+}

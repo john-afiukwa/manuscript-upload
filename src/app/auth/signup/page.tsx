@@ -1,60 +1,39 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Logo from "../images/funai_Logo.png";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore";
-import { auth, db } from "../config/firebase";
-// import { toast } from "react-toastify";
+"use client"
 
-const Signup = () => {
-  const [fName, setfName] = useState("");
-  const [lName, setlName] = useState("");
+import Link from "next/link";
+import { useState } from "react";
+import Image from "next/image";
+
+import Logo from "@public/images/funai_Logo.png";
+import { redirect } from "next/navigation";
+import { signupAction } from "@src/app/api/auth";
+
+export default function Page() { 
+  // const [fName, setfName] = useState("");
+  // const [lName, setlName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_confirmPassword, setConfirmPassword] = useState("");
 
-  const navigate = useNavigate();
-
-  const handleSubmitSigup = async (e) => {
+  const handleSubmitSigup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      const user = auth.currentUser;
-
-      if (user) {
-        await setDoc(doc(db, "Users", user.uid), {
-          email: user.email,
-          firstName: fName,
-          lastName: lName,
-        });
-      }
-      console.log(user);
-      //   toast.success("Registeration Successful!", {
-      //     position: "top-center",
-      //   });
-
-      navigate("/signin");
-    } catch (error) {
-      console.log(error.message);
-      //   toast.error(error.message, {
-      //     position: "bottom-right",
-      //   });
-    }
+   await signupAction(email, password);
+  redirect("/dashboard");
   };
 
   return (
     <>
       <div
-        className="h-screen bg-[url('images/lab2.webp')] bg-no-repeat bg-cover 
+        className="h-screen bg-[url('/images/lab2.webp')] bg-no-repeat bg-cover 
         opacity-70 flex items-center justify-center"
       >
         <div className="bg-white w-[80%] sm:w-[70%] md:w-fit p-4 rounded-lg shadow-2xl">
-          <div className="flex items-center justify-center">
-            <img src={Logo} alt="School logo" className="w-[170px] " />
+            <Image src={Logo} alt="School logo" className="w-[170px]" />
           </div>
 
-          <form className="my-5">
+          <form className="my-5" onSubmit={handleSubmitSigup}>
             <div className="sm:flex justify-evenly items-center gap-10">
               <div className="input-containers">
                 <label htmlFor="fName">First Name</label>
@@ -62,7 +41,7 @@ const Signup = () => {
                   type="text"
                   placeholder="First Name"
                   className="inputs"
-                  onChange={(e) => setfName(e.target.value)}
+                  // onChange={(e) => setfName(e.target.value)}
                 />
               </div>
 
@@ -72,7 +51,7 @@ const Signup = () => {
                   type="text"
                   placeholder="Last Name"
                   className="inputs"
-                  onChange={(e) => setlName(e.target.value)}
+                  // onChange={(e) => setlName(e.target.value)}
                 />
               </div>
             </div>
@@ -106,14 +85,12 @@ const Signup = () => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
               </div>
-            </div>
-          </form>
-
+          </div>
           <div>
             <button
+              type="submit"
               className="bg-[#1b9c70] w-full p-2 rounded-md text-white
             font-bold uppercase hover:bg-[#1b9c85]"
-              onClick={handleSubmitSigup}
             >
               Create Account
             </button>
@@ -122,16 +99,16 @@ const Signup = () => {
           <div className="flex gap-2 items-center justify-center mt-2">
             <span>Already have an account?</span>
             <Link
-              to={"/signin"}
+              href={"/auth/signin"}
               className="underline font-bold hover:text-green-600 transition"
             >
               Log in
             </Link>
           </div>
+          </form>
+
+         
         </div>
-      </div>
     </>
   );
-};
-
-export default Signup;
+}
