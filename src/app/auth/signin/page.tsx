@@ -5,15 +5,23 @@ import { useState } from "react";
 import Image from "next/image";
 
 import Logo from "@public/images/funai_Logo.png";
-import {signinAction} from "@src/app/api/auth";
+import { signinAction, verifySession } from "@src/app/api/auth";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await signinAction(email, password);
+    try {
+      await signinAction(email, password);
+      await verifySession();
+      await router.push("/manuscripts");
+    } catch (error) {
+      console.error("Error signing in:", error);
+    }
   };
 
   return (

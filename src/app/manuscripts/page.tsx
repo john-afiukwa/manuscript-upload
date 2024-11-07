@@ -71,12 +71,13 @@ export default function Page() {
         <section className="bg-violet-300 w-full px-[5rem] py-10">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-3xl font-bold">Manuscripts</h2>
-            <button
+            <Link
               className="bg-purple-500 text-white p-3 rounded font-bold 
             hover:bg-purple-700 transition"
+              href="/manuscripts/upload"
             >
               Upload Manuscript
-            </button>
+            </Link>
           </div>
 
           <div className="bg-white flex items-center justify-center rounded-lg">

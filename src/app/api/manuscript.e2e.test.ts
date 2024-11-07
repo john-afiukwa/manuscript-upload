@@ -18,7 +18,7 @@ describe('Manuscripts API', () => {
     it('should upload a file and store its reference in Firestore', async () => {
 
 
-      const downloadUrl = await uploadManuscriptAction(goodFile, fileTitle, 'testUser');
+      const downloadUrl = await uploadManuscriptAction(goodFile, fileTitle);
 
       expect(downloadUrl).toBeDefined();
       expect(downloadUrl).not.toBeInstanceOf(Error);
@@ -28,33 +28,27 @@ describe('Manuscripts API', () => {
       const fileTitle = 'testFileErr';
       const expectedErr = new Error('Only plain text files are allowed.');
 
-      await expect(uploadManuscriptAction(badFile, fileTitle, 'testUser')).rejects.toEqual(expectedErr);
+      await expect(uploadManuscriptAction(badFile, fileTitle)).rejects.toEqual(expectedErr);
     });
   });
 
   describe('getUserManuscripts', () => {
 
     afterAll(async () => { 
-      const userId = ['testUser1', 'testUser2'];
-      const promises = userId.map((id) => getUserManuscriptsAction(id));
-      const testUserManuscripts = (await Promise.all(promises)).flat()
+      const testUserManuscripts = await getUserManuscriptsAction()
 
       await Promise.all(testUserManuscripts.map((data) => deleteFile(data.title)));
     });
 
     it('should fetch user manuscripts from Firestore', async () => {
-      const userId = 'testUser1';
       const testUserManuscripts = Array.from({ length: 3 }, (_, i) => (new File([`dummy content ${i}`], `test${i}.txt`, { type: 'text/plain' })));
-      const testUser2Manuscripts = Array.from({ length: 3 }, (_, i) => (new File([`dummy content ${i}`], `test${i}.txt`, { type: 'text/plain' })));
 
-      await Promise.all(testUserManuscripts.map((file, i) => uploadManuscriptAction(file, `test-${userId + i}`, userId)));
-      await Promise.all(testUser2Manuscripts.map((file, i) => uploadManuscriptAction(file, `test-testUser2${i}`, 'testUser2')));
+      await Promise.all(testUserManuscripts.map((file, i) => uploadManuscriptAction(file, `test-${i}`)));
 
-
-      const result = await getUserManuscriptsAction(userId);
+      const result = await getUserManuscriptsAction();
 
       expect(result).toHaveLength(3);
-      expect(result.map(({userId}) => userId)).toEqual(Array(result.length).fill(userId));
+      expect(result.map(({ userId }) => userId)).toEqual(Array(result.length).fill("userId"));
     });
   });
 });

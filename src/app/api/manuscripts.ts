@@ -1,16 +1,26 @@
+"use server"
+
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db, storage } from "@src/config/firebase";
 import { deleteDoc } from "firebase/firestore";
 import { deleteObject } from "firebase/storage";
+import { getCurrentUser } from "@src/app/api/auth";
+import { UserNotAuthenticatedError } from "@src/app/api/errors";
 
-export async function uploadManuscriptAction(file: File, fileTitle: string, userId: string): Promise<string> {
+export async function uploadManuscriptAction(file: File, fileTitle: string): Promise<string> {
   try {
+    const user = await getCurrentUser();
+    // if (!user) {
+    //   throw new UserNotAuthenticatedError();
+    // }
 
-    if (file.type !== "text/plain") {
-      throw new Error("Only plain text files are allowed.");
+    const isValid = validateManuscriptFile(file);
+    if (!isValid) {
+      throw new ManuscriptUploadError("Only Word documents are allowed.");
     }
+
     // Create a storage reference
     const storageRef = ref(storage, `manuscripts/${fileTitle}`);
 
@@ -24,23 +34,26 @@ export async function uploadManuscriptAction(file: File, fileTitle: string, user
     await setDoc(doc(db, "manuscripts", fileTitle), {
       title: fileTitle,
       url: downloadURL,
-      userId,
+      userId: user?.id || 'dummyUserId',
       createdAt: new Date()
     });
 
-   return downloadURL;
+    return downloadURL
   } catch (error) {
     console.error('Error uploading file and storing reference:', error);
     return Promise.reject(error);
   }
 }
 
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Firestore data is untyped, @todo: add expected types
-export async function getUserManuscriptsAction(userId: string): Promise<any[]> {
+export async function getUserManuscriptsAction(): Promise<any[]> {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      throw new UserNotAuthenticatedError();
+    }
     const manuscriptsRef = collection(db, "manuscripts");
-    const q = query(manuscriptsRef, where("userId", "==", userId));
+    const q = query(manuscriptsRef, where("userId", "==", user.id));
     const querySnapshot = await getDocs(q);
 
     const manuscripts = querySnapshot.docs.map(doc => ({
@@ -70,6 +83,18 @@ export async function deleteFile(fileTitle: string): Promise<void> {
   } catch (error) {
     console.error('Error deleting file and its reference:', error);
     return Promise.reject(error);
+  }
+}
+
+
+function validateManuscriptFile(file: File): boolean {
+  return file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+}
+
+class ManuscriptUploadError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ManuscriptUploadError";
   }
 }
 
