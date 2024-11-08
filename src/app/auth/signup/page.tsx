@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -9,29 +9,34 @@ import { signupAction, verifySession } from "@src/app/api/auth";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
-  // const [fName, setfName] = useState("");
-  // const [lName, setlName] = useState("");
+  const [fName, setfName] = useState("");
+  const [lName, setlName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
 
   const handleSubmitSigup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    await signupAction(email, password);
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    await signupAction(email, password, fName, lName);
     await verifySession();
     router.push("/manuscripts");
   };
 
   return (
-    <>
-      <div
-        className="h-screen bg-[url('/images/lab2.webp')] bg-no-repeat bg-cover 
+    <div
+      className="h-screen bg-[url('/images/labphoto.webp')] bg-no-repeat bg-cover 
         opacity-70 flex items-center justify-center"
-      >
-        <div className="bg-white w-[80%] sm:w-[70%] md:w-fit p-4 rounded-lg shadow-2xl">
+    >
+      <div className="bg-white w-[80%] sm:w-[70%] md:w-fit p-4 rounded-lg shadow-2xl">
+        <div className="flex item-center justify-center">
           <Image src={Logo} alt="School logo" className="w-[170px]" />
         </div>
 
@@ -43,7 +48,7 @@ export default function Page() {
                 type="text"
                 placeholder="First Name"
                 className="inputs"
-              // onChange={(e) => setfName(e.target.value)}
+                onChange={(e) => setfName(e.target.value)}
               />
             </div>
 
@@ -53,7 +58,7 @@ export default function Page() {
                 type="text"
                 placeholder="Last Name"
                 className="inputs"
-              // onChange={(e) => setlName(e.target.value)}
+                onChange={(e) => setlName(e.target.value)}
               />
             </div>
           </div>
@@ -88,15 +93,14 @@ export default function Page() {
               />
             </div>
           </div>
-          <div>
-            <button
-              type="submit"
-              className="bg-[#1b9c70] w-full p-2 rounded-md text-white
-            font-bold uppercase hover:bg-[#1b9c85]"
-            >
-              Create Account
-            </button>
-          </div>
+
+          <button
+            type="submit"
+            className="bg-[#1b9c70] w-full p-2 rounded-md text-white
+            font-bold uppercase hover:bg-[#1b9c85] mt-2"
+          >
+            Create Account
+          </button>
 
           <div className="flex gap-2 items-center justify-center mt-2">
             <span>Already have an account?</span>
@@ -108,9 +112,8 @@ export default function Page() {
             </Link>
           </div>
         </form>
-
-
       </div>
-    </>
+
+    </div>
   );
 }
