@@ -7,6 +7,7 @@ import { JWTPayload, SignJWT, jwtVerify } from 'jose'
 import { cache } from "react";
 import { z } from 'zod';
 import { passwordSchema, userDataSchema } from "@src/app/schema/auth";
+import { FirebaseError } from "firebase/app";
 
 interface SessionPayload extends JWTPayload {
   email: string
@@ -58,11 +59,17 @@ export async function signupAction(email: string, password: string, firstName: s
   } catch (error) {
     console.log(error);
     
+    if (error instanceof FirebaseError) {
+      if (error.code === "auth/email-already-in-use") {
+        return Promise.reject("Email already in use");
+      }
+    }
+
     if (error instanceof Error) {
       return Promise.reject(error.message);
-    } else {
-      return Promise.reject(error);
     }
+
+    return Promise.reject(error);
   }
 }
 

@@ -3,7 +3,7 @@
 import Icons from "@src/components/icons";
 import { sideNavItems } from "@src/contents/constants";
 import Link from "next/link";
-import { useState } from "react";
+import { MouseEvent as ReactMouseEvent, useState } from "react";
 import { BsArrowLeftShort } from "react-icons/bs";
 import { FaBarsStaggered } from "react-icons/fa6";
 import { FiSearch } from "react-icons/fi";
@@ -14,11 +14,20 @@ import Logo from "@public/images/FUNAI-logoSm.png";
 import Image from "next/image";
 import NewManuscriptModal from "@src/components/newManuscriptModal";
 import { FaTimes } from "react-icons/fa";
+import { signoutAction } from "@src/app/api/auth";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [open, setOpen] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
+  const router = useRouter();
+
+  const handleSignout = async (e: ReactMouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    await signoutAction();
+    router.push("/auth/signin");
+  }
 
   const toggleMenuBar = () => {
     setOpenMenu(!openMenu);
@@ -81,7 +90,7 @@ export default function Page() {
               </div>
             </div>
 
-            <button className={`sidebar-tags ${!open && "justify-center"}`}>
+            <button className={`sidebar-tags ${!open && "justify-center"}`} onClick={handleSignout}>
               <RiLogoutCircleLine />
               <span className={`${open ? "font-semibold text-sm" : "hidden"}`}>
                 Log out
@@ -122,7 +131,7 @@ export default function Page() {
             </button>
           </div>
 
-          <div>{/* Uploaded Manuscripts */}</div>
+          {/* <div>Uploaded Manuscripts</div> */}
 
           <NewManuscriptModal
             open={openModal}
