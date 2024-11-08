@@ -40,7 +40,7 @@ export default function Page() {
           />
 
           <div
-            className="bg-violet-500 text-white h-full flex
+            className="bg-[#1b9c85] text-white h-full flex
           flex-col justify-between px-2 py-4"
           >
             <div>
@@ -97,11 +97,11 @@ export default function Page() {
                 <FaBarsStaggered className="text-lg" onClick={toggleMenuBar} />
               </button>
 
-              <h2 className="md:text-2xl font-bold">Manuscripts</h2>
+              <h2 className="md:text-2xl text-[#0f172a] font-bold">Manuscripts</h2>
             </div>
             <button
-              className="bg-violet-500 text-white text-sm p-2 md:p-3 rounded font-bold 
-            hover:bg-violet-700 transition"
+              className="bg-[#1b9c85] text-white text-sm p-2 md:p-3 rounded font-bold 
+            hover:bg-[#178e79] duration-300"
               onClick={() => setOpenModal(true)}
             >
               Upload Manuscript

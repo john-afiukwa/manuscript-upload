@@ -33,7 +33,7 @@ label {
   }
 
   .sidebar-tags {
-    @apply flex items-center gap-2 text-xl p-2 hover:bg-violet-600 
+    @apply flex items-center gap-2 text-xl p-2 hover:bg-[#178e79] 
     transition duration-300 rounded-lg;
   }
 }

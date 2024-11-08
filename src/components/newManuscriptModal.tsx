@@ -26,7 +26,7 @@ export default function NewManuscriptModal({ open, onClose }: ModalProps) {
           className="flex items-center justify-between px-2 pt-3 
         pb-1 border-b font-semibold"
         >
-          <p className="text-purple-800">Upload Manuscript</p>
+          <p className="text-[#178e79]">Upload Manuscript</p>
           <div
             className="p-1 text-red-500 hover:bg-red-500 
           hover:text-white cursor-pointer rounded transition-all duration-500 ease-in-out"
@@ -52,7 +52,7 @@ export default function NewManuscriptModal({ open, onClose }: ModalProps) {
             <div className="bg-slate-200 flex flex-col items-center justify-center rounded">
               <input type="file" id="file" hidden />
               <SlCloudUpload
-                className="text-9xl p-3 cursor-pointer active:text-purple-800"
+                className="text-9xl p-3 cursor-pointer active:text-[#178e79]"
                 // onClick={() => document.querySelector("#file").click()}
               />
               <p className="font-semibold mb-4">
@@ -62,8 +62,8 @@ export default function NewManuscriptModal({ open, onClose }: ModalProps) {
           </div>
 
           <button
-            className="bg-purple-500 text-white font-bold w-full p-2 
-          rounded hover:bg-purple-900 transition-all duration-200"
+            className="bg-[#1b9c85] text-white font-semibold uppercase w-full p-2 
+          rounded hover:bg-[#178e79] transition-all duration-200"
           >
             Upload
           </button>
