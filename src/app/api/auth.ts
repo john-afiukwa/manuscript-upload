@@ -1,10 +1,12 @@
 "use server"
 
 import { auth } from "@src/config/firebase";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { cookies } from "next/headers";
 import { JWTPayload, SignJWT, jwtVerify } from 'jose'
 import { cache } from "react";
+import { z } from 'zod';
+import { passwordSchema, userDataSchema } from "@src/app/schema/auth";
 
 interface SessionPayload extends JWTPayload {
   email: string
@@ -33,9 +35,21 @@ export async function signinAction(email: string, password: string): Promise<voi
   }
 }
 
-export async function signupAction(email: string, password: string): Promise<void> {
+export async function signupAction(email: string, password: string, firstName: string, lastName: string): Promise<void> {
   try {
+    const userData = validateUserData(email, firstName, lastName);
+    if (!userData.isValid) {
+      return Promise.reject(userData.errors);
+    }
+
+    const passwordStrength = validatePasswordStrength(password);
+    if (!passwordStrength.isValid) {
+      return Promise.reject(passwordStrength.errors);
+    }
+
     const creds = await createUserWithEmailAndPassword(auth, email, password);
+    await sendEmailVerification(creds.user);
+
     await createUserSession({
       email: email,
       userId: creds.user.uid,
@@ -73,19 +87,6 @@ export async function getCurrentUser(): Promise<null | { email: string; id: stri
     console.log(error);
     return null;
   }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- middleware handler can take any arguments
-export async function authMiddleware(handler: (...args: any[]) => Promise<any>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- middleware handler can take any arguments
-  return async function (...args: any[]) {
-    const user = auth.currentUser;
-    if (user && user.email) {
-      return handler(...args);
-    } else {
-      throw new Error("User is not authenticated");
-    }
-  };
 }
 
 export const verifySession = cache(async () => {
@@ -130,4 +131,46 @@ async function createUserSession(payload: SessionPayload) {
     sameSite: 'lax',
     path: '/',
   });
+}
+
+function validatePasswordStrength(password: string): { isValid: boolean; errors: string[] | null } {
+  try {
+    passwordSchema.parse(password);
+    return {
+      isValid: true,
+      errors: null,
+    };
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      return {
+        isValid: false,
+        errors: e.errors.map((error) => error.message),
+      }
+    }
+    return {
+      isValid: false,
+      errors: ["An error occurred while validating the password"],
+    };
+  }
+}
+
+function validateUserData(email: string, firstName: string, lastName: string): { isValid: boolean; errors: string[] | null } {
+  try {
+    userDataSchema.parse({ email, firstName, lastName });
+    return {
+      isValid: true,
+      errors: null,
+    };
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      return {
+        isValid: false,
+        errors: e.errors.map((error) => error.message),
+      }
+    }
+    return {
+      isValid: false,
+      errors: ["An error occurred while validating the user data"],
+    };
+  }
 }
