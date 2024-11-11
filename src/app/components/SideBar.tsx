@@ -1,8 +1,6 @@
 "use client";
 
 import { MouseEvent as ReactMouseEvent } from "react";
-import { useRouter } from "next/navigation";
-import { signoutAction } from "../api/auth";
 import { useState } from "react";
 import { BsArrowLeftShort } from "react-icons/bs";
 import Image from "next/image";
@@ -14,12 +12,12 @@ import { RiLogoutCircleLine } from "react-icons/ri";
 import FunaiLogo from "@public/images/funai_Logo.png";
 import Logo from "@public/images/FUNAI-logoSm.png";
 import { FaBarsStaggered } from "react-icons/fa6";
+import { useAuth } from "@src/hooks/useAuth";
 
 export default function SideBar() {
   const [open, setOpen] = useState(true);
   const [openMenu, setOpenMenu] = useState(false);
-  const router = useRouter();
-
+  const { signout } = useAuth();
 
   const toggleMenuBar = () => {
     setOpenMenu(!openMenu);
@@ -27,19 +25,16 @@ export default function SideBar() {
 
   const handleSignout = async (e: ReactMouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    await signoutAction();
-    router.push("/auth/signin");
+    await signout();
   }
 
-  return <div className="relative">
-    <button className="md:hidden px-8 pt-12">
+  return (<div className="relative">
+    <button className="mt-10 ml-4 p-2 md:hidden">
       <FaBarsStaggered className="text-lg" onClick={toggleMenuBar} />
     </button>
 
     <section
-      className={`absolute md:block h-screen top-0 ${open ? "w-72" : "w-[80px]"
-        } duration-300 md:relative absolute ${openMenu ? "left-0" : "left-[-20rem] md:left-0"
-        }`}
+      className={`absolute md:block h-screen top-0 ${open ? "w-72" : "w-[80px]"} duration-300 md:relative absolute ${openMenu ? "left-0" : "left-[-20rem] md:left-0"}`}
     >
       <BsArrowLeftShort
         className={`hidden md:block bg-white text-2xl rounded-full absolute -right-3 
@@ -98,4 +93,5 @@ flex-col justify-between px-2 py-4"
       </div>
     </section>
   </div>
+  )
 }
