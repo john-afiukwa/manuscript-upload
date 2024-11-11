@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { FiSearch } from "react-icons/fi";
 
 import ManuscriptUploadModal from "@src/app/(protected)/manuscripts/components/UploadModal";
+import { DataTableDemo } from "./components/DataTable";
 
 export default function Page() {
   const [openModal, setOpenModal] = useState(false);
@@ -29,22 +29,7 @@ export default function Page() {
             Upload Manuscript
           </button>
         </div>
-
-        <div className="bg-slate-200 flex items-center justify-center rounded-lg">
-          <input
-            type="search"
-            className="bg-transparent w-full text-lg outline-none px-3 py-2"
-            placeholder="Search"
-          />
-          <button
-            className="py-[.8rem] px-4 cursor-pointer text-black 
-            hover:bg-[#1b9c85] hover:text-white transition rounded-r-lg"
-          >
-            <FiSearch className="text-xl" />
-          </button>
-        </div>
-
-        {/* <div>Uploaded Manuscripts</div> */}
+        <DataTableDemo />
       </section>
     </>
   );
