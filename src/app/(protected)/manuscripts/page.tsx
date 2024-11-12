@@ -3,18 +3,18 @@
 import { useState } from "react";
 
 import ManuscriptUploadModal from "@src/app/(protected)/manuscripts/components/UploadModal";
-import { DataTableDemo } from "./components/DataTable";
+import { ManuscriptsDataTable } from "./components/ManuscriptsDataTable";
 
 export default function Page() {
   const [openModal, setOpenModal] = useState(false);
 
   return (
     <>
-      <section className="w-full">
+      <section className="w-full max-w-[50rem] m-auto">
         {openModal && (
           <ManuscriptUploadModal
             open={openModal}
-            onClose={() => setOpenModal(false)}
+            closeModalAction={() => setOpenModal(false)}
           />
         )}
         <div className="flex items-center justify-between mb-4">
@@ -29,7 +29,7 @@ export default function Page() {
             Upload Manuscript
           </button>
         </div>
-        <DataTableDemo />
+        <ManuscriptsDataTable />
       </section>
     </>
   );

@@ -82,11 +82,11 @@ export async function signoutAction(): Promise<void> {
   }
 }
 
-export async function getCurrentUser(): Promise<null | { email: string; id: string }> {
+export async function getCurrentUser(): Promise<null | { id: string }> {
   try {
-    const user = auth.currentUser;
-    if (user && user.email) {
-      return { email: user.email, id: user.uid };
+    const user = await verifySession();
+    if (user && user.isAuth) {
+      return { id: user.userId as string };
     } else {
       return null;
     }
@@ -124,7 +124,7 @@ async function decrypt(session: string | undefined = '') {
   }
 }
 
-async function createUserSession(payload: SessionPayload) {
+export async function createUserSession(payload: SessionPayload) {
   const sessionString = await encrypt({
     email: payload.email ?? "",
     userId: payload.userId ?? "",

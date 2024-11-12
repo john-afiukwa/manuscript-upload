@@ -4,3 +4,10 @@ export class UserNotAuthenticatedError extends Error {
     this.name = "AuthenticationError";
   }
 }
+
+export class ManuscriptUploadError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ManuscriptUploadError";
+  }
+}

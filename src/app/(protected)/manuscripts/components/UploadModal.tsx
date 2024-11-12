@@ -1,5 +1,6 @@
 "use client";
 
+import { useToast } from "@/hooks/use-toast";
 import { uploadManuscriptAction } from "@src/app/api/manuscripts";
 import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
@@ -7,46 +8,63 @@ import { SlCloudUpload } from "react-icons/sl";
 
 interface ModalProps {
   open: boolean;
-  onClose: () => unknown;
+  closeModalAction: () => unknown;
 }
 
-export default function Modal({ open, onClose }: ModalProps) {
+export default function Modal({ open, closeModalAction }: ModalProps) {
   const defaultDisplay = "Select document to upload";
+  const { toast } = useToast()
   const [manuscriptTitle, setManuscriptTitle] = useState("");
   const [displayFileName, setDisplayFileName] = useState(defaultDisplay);
-
-  const uploadManuscript = async (files: FileList) => {
-    if (files.length > 1) {
-      alert("Only one file is allowed");
-      return;
-    }
-
-    if (!manuscriptTitle) {
-      alert("Manuscript title is required");
-      return;
-    }
-
-    const file = files[0];
-    if (file) {
-      try {
-        await uploadManuscriptAction(file, manuscriptTitle || file.name);
-        alert("File uploaded successfully");
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        alert("Failed to upload file");
-      }
-    } else {
-      alert("No file selected");
-    }
-  };
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const input = document.querySelector("#upload-file") as HTMLInputElement;
-    if (input && input.files && input.files[0]) {
-      await uploadManuscript(input.files);
-    } else {
-      alert("No file selected");
+    try {
+      setLoading(true);
+      const input = document.querySelector("#upload-file") as HTMLInputElement;
+      const files = input.files || [];
+
+      if (files.length === 0) {
+        setError("No file selected");
+        setLoading(false);
+        return;
+      }
+
+      if (files.length > 1) {
+        setError("Only one file is allowed");
+        setLoading(false);
+        return;
+      }
+
+      if (!manuscriptTitle) {
+        setError("Manuscript title is required");
+        setLoading(false);
+        return;
+      }
+
+      const file = files[0];
+      await uploadManuscriptAction(file, manuscriptTitle || file.name);
+      toast({
+        title: "Manuscript uploaded",
+        description: "Your manuscript has been uploaded successfully",
+        variant: "success",
+      });
+      closeModalAction();
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      if (error instanceof Error) {
+        setError(error.message);
+        setLoading(false);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "There was a problem with your request. Please try again.",
+        })
+        closeModalAction();
+      }
     }
   };
 
@@ -54,7 +72,7 @@ export default function Modal({ open, onClose }: ModalProps) {
     <div
       className={`flex z-10 items-center justify-center fixed inset-0
         transition-color ${open ? "visible bg-black/30" : "invisible"}`}
-      onClick={onClose}
+      onClick={closeModalAction}
     >
       <div
         className={`bg-white rounded-lg shadow-md transition-all
@@ -69,11 +87,13 @@ export default function Modal({ open, onClose }: ModalProps) {
           <div
             className="p-1 text-gray-400 hover:text-gray-600 cursor-pointer rounded transition-all duration-500 ease-in-out transform hover:scale-110"
           >
-            <FaTimes onClick={onClose} />
+            <FaTimes onClick={closeModalAction} />
           </div>
         </div>
 
         <form className="w-full px-4 py-8 flex flex-col gap-8" onSubmit={handleSubmit}>
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
           <div className="flex flex-col gap-2">
             <label htmlFor="title" className="text-gray-500">
               Title
@@ -107,9 +127,12 @@ export default function Modal({ open, onClose }: ModalProps) {
               </div>
               <p className="text-[#1b9c85] cursor-pointer font-semibold">Browse file</p>
               <input type="file" id="upload-file" hidden onChange={(e) => {
+                setError(null);
                 const files = e.target.files;
                 if (files && files[0]) {
-                  setDisplayFileName(files[0].name);
+                  const fileName = files[0].name;
+                  const truncatedFileName = fileName.length > 20 ? fileName.substring(0, 30) + "..." : fileName;
+                  setDisplayFileName(truncatedFileName);
                 }
               }} />
             </div>
@@ -117,9 +140,10 @@ export default function Modal({ open, onClose }: ModalProps) {
 
           <button
             type="submit"
-            className="bg-[#1b9c85] text-white font-semibold uppercase w-full p-4 rounded-md hover:bg-[#178e79] transition-all duration-200"
+            disabled={loading}
+            className="bg-[#1b9c85] text-white font-semibold uppercase w-full p-4 rounded-md hover:bg-[#178e79] transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none"
           >
-            Upload
+            {loading ? "Uploading..." : "Upload"}
           </button>
         </form>
       </div>

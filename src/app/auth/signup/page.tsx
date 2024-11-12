@@ -132,16 +132,16 @@ export default function Page() {
 
   return (
     <div
-      className="h-screen bg-[url('/images/labphoto.webp')] bg-no-repeat bg-cover 
-        opacity-70 flex items-center justify-center"
+      className="relative h-screen bg-[url('/images/labphoto.webp')] bg-no-repeat bg-cover flex items-center justify-center"
     >
-      <div className="bg-white sm:w-[70%] md:w-[500px] max-w-[500px] p-4 rounded-lg shadow-2xl">
+      <div className="absolute inset-0 bg-gray-100 opacity-40"></div>
+      <div className="bg-white sm:w-[80%] md:w-[500px] max-w-[500px] p-4 rounded-lg shadow-2xl z-10 text-gray-600">
         <div className="flex item-center justify-center">
           <Image src={Logo} alt="School logo" className="w-[170px]" />
         </div>
 
-        <form className="my-5" onSubmit={handleSubmitSigup}>
-          <h1 className="text-2xl font-bold text-center">Sign up</h1>
+        <form className="my-5 flex flex-col gap-2" onSubmit={handleSubmitSigup}>
+          <h1 className="text-xl font-bold text-center uppercase">Create An Account</h1>
           {signUpErr && <p className="text-red-500 text-center">{signUpErr}</p>}
             <div className="input-containers">
             <label htmlFor="firstName">First Name</label>
@@ -182,7 +182,6 @@ export default function Page() {
             <InputError field="email" />
           </div>
 
-          <div className="">
             <div className="input-containers">
               <label htmlFor="password">Password</label>
               <input
@@ -205,8 +204,7 @@ export default function Page() {
                 value={signUpData.confirmPassword}
                 onChange={handleFormChange}
               />
-              <InputError field="confirmPassword" />
-            </div>
+            <InputError field="confirmPassword" />
           </div>
 
           <button

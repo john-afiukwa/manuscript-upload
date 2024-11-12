@@ -10,7 +10,12 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
     ];
-  }
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '3mb',
+    },
+  },
 };
 
 export default nextConfig;

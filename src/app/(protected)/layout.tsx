@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
 import SideBar from "@src/app/components/SideBar";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -40,12 +44,15 @@ function ProtectedLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <section className="flex flex-col md:flex-row w-full md:gap-4">
+  const queryClient = new QueryClient()
+
+  return <QueryClientProvider client={queryClient}><section className="flex flex-col md:flex-row w-full md:gap-4">
     <SideBar />
     <section className="my-4 md:my-10 mx-4 flex-1">
       {children}
     </section>
-  </section>;
+  </section>
+  </QueryClientProvider>;
 }
 
 export default AuthHOC(ProtectedLayout);

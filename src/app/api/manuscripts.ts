@@ -7,14 +7,21 @@ import { db, storage } from "@src/config/firebase";
 import { deleteDoc } from "firebase/firestore";
 import { deleteObject } from "firebase/storage";
 import { getCurrentUser } from "@src/app/api/auth";
-import { UserNotAuthenticatedError } from "@src/app/api/errors";
+import { ManuscriptUploadError, UserNotAuthenticatedError } from "@src/app/api/errors";
+
+export type ManuscriptRecord = {
+  id: string
+  title: string
+  docUrl: string
+  status: "published" | "editing" | "rejected"
+}
 
 export async function uploadManuscriptAction(file: File, fileTitle: string): Promise<string> {
   try {
     const user = await getCurrentUser();
-    // if (!user) {
-    //   throw new UserNotAuthenticatedError();
-    // }
+    if (!user || !user.id) {
+      throw new UserNotAuthenticatedError();
+    }
 
     const isValid = validateManuscriptFile(file);
     if (!isValid) {
@@ -34,7 +41,7 @@ export async function uploadManuscriptAction(file: File, fileTitle: string): Pro
     await setDoc(doc(db, "manuscripts", fileTitle), {
       title: fileTitle,
       url: downloadURL,
-      userId: user?.id || 'dummyUserId',
+      userId: user.id,
       createdAt: new Date()
     });
 
@@ -46,7 +53,7 @@ export async function uploadManuscriptAction(file: File, fileTitle: string): Pro
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Firestore data is untyped, @todo: add expected types
-export async function getUserManuscriptsAction(): Promise<any[]> {
+export async function getUserManuscriptsAction(): Promise<ManuscriptRecord[]> {
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -56,9 +63,11 @@ export async function getUserManuscriptsAction(): Promise<any[]> {
     const q = query(manuscriptsRef, where("userId", "==", user.id));
     const querySnapshot = await getDocs(q);
 
-    const manuscripts = querySnapshot.docs.map(doc => ({
+    const manuscripts: ManuscriptRecord[] = querySnapshot.docs.map(doc => ({
       id: doc.id,
-      ...doc.data()
+      title: doc.data().title,
+      docUrl: doc.data().url,
+      status: "editing",
     }));
 
     return manuscripts;
@@ -89,13 +98,6 @@ export async function deleteFile(fileTitle: string): Promise<void> {
 
 function validateManuscriptFile(file: File): boolean {
   return file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-}
-
-class ManuscriptUploadError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "ManuscriptUploadError";
-  }
 }
 
 
