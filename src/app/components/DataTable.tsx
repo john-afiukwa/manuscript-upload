@@ -66,6 +66,8 @@ export function DataTable<T>({ data, columns, searchBy, showSelectedCounts, load
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
+          name="filter"
+          id="filter"
           placeholder={`Filter by ${searchBy || ""}...`}
           value={(table.getColumn(searchBy || "")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>

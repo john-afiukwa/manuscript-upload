@@ -28,13 +28,15 @@ export default function SideBar() {
     await signout();
   }
 
-  return (<div className="relative">
-    <button className="mt-10 ml-4 p-2 md:hidden">
+  return (<>
+    <div className="flex items-center h-full md:hidden">
+      <button className="p-4 md:hidden">
       <FaBarsStaggered className="text-lg" onClick={toggleMenuBar} />
     </button>
-
+    </div>
+    <div className="w-full h-screen max-w-72">
     <section
-      className={`absolute md:block h-screen top-0 ${open ? "w-72" : "w-[80px]"} duration-300 md:relative absolute ${openMenu ? "left-0" : "left-[-20rem] md:left-0"}`}
+        className={`absolute md:relative z-10 md:block h-full top-0 ${open ? "w-72" : "w-[80px]"} duration-300 ${openMenu ? "left-0" : "left-[-20rem] md:left-0"}`}
     >
       <BsArrowLeftShort
         className={`hidden md:block bg-white text-2xl rounded-full absolute -right-3 
@@ -49,9 +51,9 @@ flex-col justify-between px-2 py-4"
         <div>
           <div className="m-2 flex items-center justify-between gap-4">
             {open ? (
-              <Image src={FunaiLogo} alt="Funai Logo" className="w-40" />
+                <Image src={FunaiLogo} alt="Funai Logo" className="w-40" priority />
             ) : (
-              <Image src={Logo} alt="Logo" className="w-40" />
+                  <Image src={Logo} alt="Logo" className="w-40" priority />
             )}
 
             <button>
@@ -93,5 +95,6 @@ flex-col justify-between px-2 py-4"
       </div>
     </section>
   </div>
+  </>
   )
 }

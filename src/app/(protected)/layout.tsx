@@ -8,6 +8,8 @@ import SideBar from "@src/app/components/SideBar";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { verifySession } from "@src/app/api/auth";
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
+import app from '@src/config/firebase';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- HOC
 function AuthHOC(Component: React.ComponentType<any>) {
@@ -28,6 +30,10 @@ function AuthHOC(Component: React.ComponentType<any>) {
       };
 
       validateAuth();
+      initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string),
+        isTokenAutoRefreshEnabled: true,
+      });
     }, [authenticated]);
 
 
@@ -46,12 +52,16 @@ function ProtectedLayout({
 }>) {
   const queryClient = new QueryClient()
 
-  return <QueryClientProvider client={queryClient}><section className="flex flex-col md:flex-row w-full md:gap-4">
-    <SideBar />
-    <section className="my-4 md:my-10 mx-4 flex-1">
-      {children}
-    </section>
-  </section>
+  return <QueryClientProvider client={queryClient}>
+    <div className="grid grid-rows-[4rem_1fr] md:grid-rows-none md:grid-cols md:grid-cols-[auto_1fr]">
+      <section className="w-fit h-full">
+        <SideBar />
+      </section>
+      <section className="w-full px-4 py-4 md:py-10">
+        {children}
+      </section>
+
+    </div>
   </QueryClientProvider>;
 }
 

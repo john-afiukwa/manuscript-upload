@@ -62,7 +62,7 @@ export const columns: ColumnDef<ManuscriptRecord>[] = [
       return (
         <div className="w-full text-right">
           <Button
-            className="self-end"
+            className={`self-end hover:bg-gray-200`}
             size={"icon"}
             variant={"link"}
             onClick={() => {

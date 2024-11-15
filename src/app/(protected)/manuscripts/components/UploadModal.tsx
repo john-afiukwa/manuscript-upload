@@ -45,6 +45,13 @@ export default function Modal({ open, closeModalAction }: ModalProps) {
       }
 
       const file = files[0];
+
+      if (!(file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+        setError("Only Word documents are allowed");
+        setLoading(false);
+        return;
+      }
+
       await uploadManuscriptAction(file, manuscriptTitle || file.name);
       toast({
         title: "Manuscript uploaded",
@@ -54,17 +61,14 @@ export default function Modal({ open, closeModalAction }: ModalProps) {
       closeModalAction();
     } catch (error) {
       console.error("Error uploading file:", error);
-      if (error instanceof Error) {
-        setError(error.message);
-        setLoading(false);
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: "There was a problem with your request. Please try again.",
-        })
-        closeModalAction();
-      }
+      setLoading(false);
+      setError("An error occurred. Please try again");
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request. Please try again.",
+      })
+      // closeModalAction();
     }
   };
 
@@ -77,7 +81,7 @@ export default function Modal({ open, closeModalAction }: ModalProps) {
       <div
         className={`bg-white rounded-lg shadow-md transition-all
         duration-300 ease-in-out ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"
-          } max-w-full sm:min-w-[500px] mx-4 sm:mx-0`}
+          } max-w-[500px] sm:min-w-[500px] mx-4 sm:mx-0`}
         onClick={(e) => e.stopPropagation()}
       >
         <div
@@ -92,7 +96,7 @@ export default function Modal({ open, closeModalAction }: ModalProps) {
         </div>
 
         <form className="w-full px-4 py-8 flex flex-col gap-8" onSubmit={handleSubmit}>
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          {error && <p className="text-red-500 text-sm text-center text-wrap truncate">{error}</p>}
 
           <div className="flex flex-col gap-2">
             <label htmlFor="title" className="text-gray-500">

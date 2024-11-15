@@ -137,7 +137,7 @@ export default function Page() {
       <div className="absolute inset-0 bg-gray-100 opacity-40"></div>
       <div className="bg-white sm:w-[80%] md:w-[500px] max-w-[500px] p-4 rounded-lg shadow-2xl z-10 text-gray-600">
         <div className="flex item-center justify-center">
-          <Image src={Logo} alt="School logo" className="w-[170px]" />
+          <Image src={Logo} alt="School logo" className="w-[170px]" priority />
         </div>
 
         <form className="my-5 flex flex-col gap-2" onSubmit={handleSubmitSigup}>
