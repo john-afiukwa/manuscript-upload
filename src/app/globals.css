@@ -209,20 +209,14 @@ button:disabled {
   body {
     @apply bg-background text-foreground;
   }
-  .profile-inputs {
+  .jbsmr-inputs {
     @apply h-10 bg-white outline-none rounded px-3 text-lg;
   }
-  .profile-inputs-container {
+  .jbsmr-inputs-container {
     @apply flex flex-col w-full gap-3 pb-3 md:pb-0;
   }
-  .double-inputs-container {
-    @apply md:flex items-center justify-between gap-10 md:pb-3;
-  }
-  .single-inputs-container {
-    @apply flex flex-col gap-3 pb-3;
-  }
-  .global-btns {
-    @apply bg-[#1b9c85] hover:bg-[#178e79] mt-10 p-3 font-semibold text-white rounded-lg
+  .primary-btns {
+    @apply bg-[#1b9c85] hover:bg-[#178e79] font-semibold text-white rounded-lg duration-300
   }
 }
 
