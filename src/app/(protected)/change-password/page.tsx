@@ -10,7 +10,9 @@ export default function ChangePassword() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Password changed or not");
+    console.log(
+      `Current: ${currentPassword} New:${newPassword} Confirm: ${confirmNewPassword}`
+    );
   };
   return (
     <>

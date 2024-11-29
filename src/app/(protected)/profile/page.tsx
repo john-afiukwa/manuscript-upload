@@ -18,7 +18,15 @@ export default function Profile() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Profile Submitted");
+    console.log(
+      `Name: ${fName} ${lName}
+      Email: ${email}
+      Address: ${address}
+      Mobile: ${mobileNumber}
+      City: ${city}
+      State: ${state}
+      `
+    );
     setActive(!active);
   };
 
