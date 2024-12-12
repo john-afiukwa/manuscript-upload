@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 import Image from "next/image";
 
 import Logo from "@public/images/funai_Logo.png";
-import { createUserSession, signupAction, verifySession } from "@src/app/api/auth";
+import { createUserRef, createUserSession, getUserRef, signupAction, verifySession } from "@src/app/api/auth";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { passwordSchema } from "@src/app/schema/auth";
@@ -45,9 +45,26 @@ export default function Page() {
     try {
       const creds = await signInWithPopup(auth, googleAuthProvider);
 
+      if (!creds.user.email || !creds.user.uid || !creds.user.displayName) {
+        throw new Error("Invalid google user credentials. Please try filling out the form to create an account.");
+      }
+      const user = await getUserRef(creds.user.email, creds.user.uid);
+
+      if (!user) {
+        await createUserRef({
+          email: creds.user.email,
+          userId: creds.user.uid,
+          firstName: creds.user.displayName?.split(" ")[0],
+          lastName: creds.user.displayName?.split(" ")[1],
+        })
+      }
+
       await createUserSession({
-        email: creds.user.email ?? "",
+        email: creds.user.email,
         userId: creds.user.uid,
+        firstName: creds.user.displayName?.split(" ")[0],
+        lastName: creds.user.displayName?.split(" ")[1],
+        name: creds.user.displayName,
         role: "user",
       })
       await verifySession();

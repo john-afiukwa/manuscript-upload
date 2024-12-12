@@ -1,5 +1,6 @@
 "use server"
 
+import { v4 as uuidV4 } from "uuid";
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, query, where, getDocs } from "firebase/firestore";
@@ -8,18 +9,18 @@ import { deleteDoc } from "firebase/firestore";
 import { deleteObject } from "firebase/storage";
 import { getCurrentUser } from "@src/app/api/auth";
 import { ManuscriptUploadError, UserNotAuthenticatedError } from "@src/app/api/errors";
+import { sendNewManuscriptNotification } from "./notifications";
 
 export type ManuscriptRecord = {
   id: string
   title: string
   docUrl: string
-  status: "published" | "editing" | "rejected"
 }
 
 export async function uploadManuscriptAction(file: File, fileTitle: string): Promise<string> {
   try {
     const user = await getCurrentUser();
-    if (!user || !user.id) {
+    if (!user || !user.userId) {
       throw new UserNotAuthenticatedError();
     }
 
@@ -27,23 +28,27 @@ export async function uploadManuscriptAction(file: File, fileTitle: string): Pro
     if (!isValid) {
       throw new ManuscriptUploadError("Only Word documents are allowed.");
     }
-
+    const uniqueFileId = uuidV4();
     // Create a storage reference
-    const storageRef = ref(storage, `manuscripts/${fileTitle}`);
+    const storageRef = ref(storage, `manuscripts/${uniqueFileId}`);
 
     // Upload the file
-    const snapshot = await uploadBytes(storageRef, file);
+    const snapshot = await uploadBytes(storageRef, file, {
+      contentType: file.type
+    });
 
     // Get the file's download URL
     const downloadURL = await getDownloadURL(snapshot.ref);
 
     // Store the file reference in Firestore
-    await setDoc(doc(db, "manuscripts", fileTitle), {
+    await setDoc(doc(db, "manuscripts", uniqueFileId), {
       title: fileTitle,
       url: downloadURL,
-      userId: user.id,
+      userId: user.userId,
       createdAt: new Date()
     });
+
+    await sendNewManuscriptNotification(fileTitle, downloadURL, { email: user.email, name: user.name });
 
     return downloadURL
   } catch (error) {
@@ -60,14 +65,13 @@ export async function getUserManuscriptsAction(): Promise<ManuscriptRecord[]> {
       throw new UserNotAuthenticatedError();
     }
     const manuscriptsRef = collection(db, "manuscripts");
-    const q = query(manuscriptsRef, where("userId", "==", user.id));
+    const q = query(manuscriptsRef, where("userId", "==", user.userId));
     const querySnapshot = await getDocs(q);
 
-    const manuscripts: ManuscriptRecord[] = querySnapshot.docs.map(doc => ({
+    const manuscripts: ManuscriptRecord[] = querySnapshot.docs.sort((a, b) => b.data().createdAt - a.data().createdAt).map(doc => ({
       id: doc.id,
       title: doc.data().title,
       docUrl: doc.data().url,
-      status: "editing",
     }));
 
     return manuscripts;

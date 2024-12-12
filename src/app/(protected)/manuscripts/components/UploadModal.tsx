@@ -2,6 +2,7 @@
 
 import { useToast } from "@/hooks/use-toast";
 import { uploadManuscriptAction } from "@src/app/api/manuscripts";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { SlCloudUpload } from "react-icons/sl";
@@ -18,10 +19,30 @@ export default function Modal({ open, closeModalAction }: ModalProps) {
   const [displayFileName, setDisplayFileName] = useState(defaultDisplay);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient()
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async ({ file, fileName }: { file: File, fileName: string }) => {
+      await uploadManuscriptAction(file, fileName)
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['manuscripts'],
+        refetchType: 'all'
+      })
+      toast({
+        title: "Manuscript uploaded",
+        description: "Your manuscript has been uploaded successfully",
+        variant: "success",
+      });
+      closeModalAction();
+    }
+  })
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+
       setLoading(true);
       const input = document.querySelector("#upload-file") as HTMLInputElement;
       const files = input.files || [];
@@ -51,14 +72,7 @@ export default function Modal({ open, closeModalAction }: ModalProps) {
         setLoading(false);
         return;
       }
-
-      await uploadManuscriptAction(file, manuscriptTitle || file.name);
-      toast({
-        title: "Manuscript uploaded",
-        description: "Your manuscript has been uploaded successfully",
-        variant: "success",
-      });
-      closeModalAction();
+      mutate({ file, fileName: manuscriptTitle })
     } catch (error) {
       console.error("Error uploading file:", error);
       setLoading(false);
@@ -147,7 +161,7 @@ export default function Modal({ open, closeModalAction }: ModalProps) {
             disabled={loading}
             className="bg-[#1b9c85] text-white font-semibold uppercase w-full p-4 rounded-md hover:bg-[#178e79] transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none"
           >
-            {loading ? "Uploading..." : "Upload"}
+            {loading || isPending ? "Uploading..." : "Upload"}
           </button>
         </form>
       </div>
