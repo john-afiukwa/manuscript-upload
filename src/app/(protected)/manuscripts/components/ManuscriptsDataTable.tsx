@@ -57,7 +57,7 @@ export const columns: ColumnDef<ManuscriptRecord>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const ManuscriptRecord = row.original
+      const manuscript = row.original
 
       return (
         <div className="w-full text-right">
@@ -67,8 +67,8 @@ export const columns: ColumnDef<ManuscriptRecord>[] = [
             variant={"link"}
             onClick={() => {
               const link = document.createElement("a");
-              link.href = ManuscriptRecord.docUrl;
-              link.download = ManuscriptRecord.title;
+              link.download = manuscript.title;
+              link.href = manuscript.docUrl;
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);

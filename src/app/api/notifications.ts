@@ -20,9 +20,10 @@ export async function sendNewManuscriptNotification(title: string, downloadURL: 
         to: [emailToNotify],
         subject: 'New Manuscript Submission',
         react: NewManuscriptEmailTemplate({ toEmail: emailToNotify, user, title }),
+        replyTo: user.email,
         attachments: [
           {
-            filename: title,
+            filename: `${title}.docx`,
             path: downloadURL,
           }
         ],

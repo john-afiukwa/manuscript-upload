@@ -30,12 +30,17 @@ export async function uploadManuscriptAction(file: File, fileTitle: string): Pro
     }
     const uniqueFileId = uuidV4();
     // Create a storage reference
-    const storageRef = ref(storage, `manuscripts/${uniqueFileId}`);
+    const storageRef = ref(storage, `manuscripts/${uniqueFileId}.docx`);
 
     // Upload the file
     const snapshot = await uploadBytes(storageRef, file, {
-      contentType: file.type
+      contentType: file.type,
+      customMetadata: {
+        title: fileTitle,
+        userId: user.userId,
+      }
     });
+
 
     // Get the file's download URL
     const downloadURL = await getDownloadURL(snapshot.ref);

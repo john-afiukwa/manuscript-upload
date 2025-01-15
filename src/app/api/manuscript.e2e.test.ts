@@ -48,7 +48,7 @@ describe('Manuscripts API', () => {
       const result = await getUserManuscriptsAction();
 
       expect(result).toHaveLength(3);
-      expect(result.map(({ userId }) => userId)).toEqual(Array(result.length).fill("userId"));
+      expect(result.map(({ title }) => title)).toEqual(testUserManuscripts.map((_, i) => `test-${i}`));
     });
   });
 });
